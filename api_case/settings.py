@@ -2,8 +2,8 @@
 Django settings for api_case project.
 """
 
-from datetime import timedelta
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -101,9 +101,9 @@ DATABASES = {
         "NAME": os.environ.get("MARIADB_DATABASE", "django_db"),
         "USER": os.environ.get("MARIADB_USER", "root"),
         "PASSWORD": os.environ.get("MARIADB_PASSWORD", "root"),
-        'OPTIONS': {
-            'ssl_mode': 'DISABLED',
-            'charset': 'utf8mb4',
+        "OPTIONS": {
+            "ssl_mode": "DISABLED",
+            "charset": "utf8mb4",
         },
     }
 }
