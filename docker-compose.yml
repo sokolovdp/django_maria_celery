@@ -1,0 +1,106 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-local_maria}
+      MARIADB_USER: ${MARIADB_USER:-django_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-django_pwd}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MARIADB_USER:-django_user}", "-p${MARIADB_PASSWORD:-django_pwd}" ]
+      interval: 1s
+      timeout: 1s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 1s
+      retries: 3
+
+  api:
+    build:
+      context: .
+    container_name: api_service
+    ports:
+      - "8000:8000"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-local_maria}
+      MARIADB_USER: ${MARIADB_USER:-django_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-django_pwd}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DB: ${REDIS_DB:-0}
+      CELERY_BROKER_URL: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+      CELERY_RESULT_BACKEND: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: /app/start-api.sh
+
+  celery-worker:
+    build:
+      context: .
+    container_name: celery_worker
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-local_maria}
+      MARIADB_USER: ${MARIADB_USER:-django_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-django_pwd}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DB: ${REDIS_DB:-0}
+      CELERY_BROKER_URL: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+      CELERY_RESULT_BACKEND: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: /app/start-celery-worker.sh
+
+  celery-beat:
+    build:
+      context: .
+    container_name: celery_beat
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-local_maria}
+      MARIADB_USER: ${MARIADB_USER:-django_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-django_pwd}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DB: ${REDIS_DB:-0}
+      CELERY_BROKER_URL: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+      CELERY_RESULT_BACKEND: redis://$REDIS_HOST:$REDIS_PORT/${REDIS_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: /app/start-celery-beat.sh
+
+volumes:
+  mariadb_data:
+  redis_data:

@@ -1,0 +1,44 @@
+[project]
+name = "api_platform"
+version = "0.1.0"
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+
+[tool.isort]
+profile = "black"
+py_version = 313
+known_django = [
+    "django",
+    "django_celery_beat",
+    "rest_framework",
+    "drf_spectacular",
+]
+sections = ["STDLIB", "THIRDPARTY", "DJANGO", "FIRSTPARTY", "LOCALFOLDER"]
+skip = ["__init__.py", ".gitignore"]
+skip_glob = ["venv/*"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+lint.select = ["E4", "E7", "E9", "C90", "C901", "W", "F"]
+lint.ignore = ["E501", "F403", "F405", "W605"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 7
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.coverage.run]
+branch = true
+concurrency = ["multiprocessing"]
+source = ["api"]
+
+[tool.coverage.report]
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "coverage_report"
+title = "Api-PLatform Coverage Report"
