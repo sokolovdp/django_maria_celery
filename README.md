@@ -1,7 +1,7 @@
 # Django DRF Demo of API implementation
 
 This is a demo Django project to provide APIs for managing user rewards, with administration of models,
-with periodic task handled by Celery Beat, with extensive unittests (> 95%), and online OpenAPI/Swagger documentation
+using MariaDB database, with periodic task handled by Celery Beat, with extensive unittests (> 95%), and online OpenAPI/Swagger documentation
 
 ## Features
 
@@ -43,11 +43,10 @@ Create a superuser with username `admin` and password `admin`, or any other user
 
 All variables have default values, but can be customized through `.env` file:
 
-- `POSTGRES_DB`: Database name (default: postgres)
-- `POSTGRES_USER`: Database user (default: postgres)
-- `POSTGRES_PASSWORD`: Database password (default: postgres)
-- `POSTGRES_HOST`: Database host (default: db)
-- `POSTGRES_PORT`: Database port (default: 5432)
+- `MARIADB_ROOT_PASSWORD`: MariaDB root user password (default: 'root')
+- `MARIADB_DATABASE`: Database name (default: 'local_maria')
+- `MARIADB_USER`: MariaDB user (default: 'django_user')
+- `MARIADB_PASSWORD`: User password (default: 'django_pwd')
 - `REDIS_HOST`: Redis host (default: redis)
 - `REDIS_PORT`: Redis port (default: 6379)
 - `REDIS_DB`: Redis database number (default: 0)
