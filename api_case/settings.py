@@ -98,7 +98,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "HOST": os.environ.get("MARIADB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("MARIADB_PORT", 3306),
-        "NAME": os.environ.get("MARIADB_DATABASE", "local_maria"),
+        "NAME": os.environ.get("MARIADB_DATABASE", "django_db"),
         "USER": os.environ.get("MARIADB_USER", "root"),
         "PASSWORD": os.environ.get("MARIADB_PASSWORD", "root"),
         'OPTIONS': {
